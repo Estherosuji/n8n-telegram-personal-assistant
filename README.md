@@ -28,8 +28,7 @@ language and sent to the user via Telegram.
 
 14 features total across the three agents.
 
-## Demo
-https://www.loom.com/share/b583d388b9184386928fd99c51b1bb54
+## Demo https://www.loom.com/share/b583d388b9184386928fd99c51b1bb54
 ## Files
 - `Telegram Personal Assistant (2).json` — main router: receives the message, 
   parses intent, routes to the correct agent
@@ -42,7 +41,7 @@ https://www.loom.com/share/b583d388b9184386928fd99c51b1bb54
 ![Calendar agent](calendar-agent-screenshot.png)
 ![Email agent](Email-agent-screenshot.png)
 ![contact agent](contact-agent-screenshot.png)
-![Tasks carried out](tasks-screenshot.png)
+![Tasks carried out](screenshot.png)
 
 ## Note
 API keys and credentials have been removed from these exports. To run 

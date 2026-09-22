@@ -1,0 +1,892 @@
+{
+  "name": "Telegram Personal Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3904,
+        96
+      ],
+      "id": "53bc5604-f540-4263-bebc-b446717c96cc",
+      "name": "Telegram Trigger",
+      "webhookId": "74c84e1d-cdf2-442a-b6b7-119cd71c9990",
+      "credentials": {
+        "telegramApi": {
+          "id": "xZjV4gPR3127ZD0V",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nlet text = '';\nif (input.choices && input.choices[0]) {\n  text = input.choices[0].message.content;\n} else { text = JSON.stringify(input); }\n\nlet cleaned = text.replace(/```json|```/g, '').trim();\n\n// Fix literal newlines inside JSON string values by escaping them\ncleaned = cleaned.replace(/\"((?:[^\"\\\\]|\\\\.)*)\"/g, function(match, group) {\n  const fixed = group.replace(/\\n/g, '\\\\n').replace(/\\r/g, '\\\\r');\n  return '\"' + fixed + '\"';\n});\n\nconst parsed = JSON.parse(cleaned);\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3088,
+        96
+      ],
+      "id": "3edb4020-34af-4f4e-8f3f-2512d9805e23",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "contact",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8f13010d-6957-41e1-b852-69aa4c441336"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Contact Agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c34a69cb-85eb-401e-8f4e-cfd5ebdd9d95",
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "calendar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Calendar Agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "484f8107-d40e-4089-92cc-7b9fa3725432",
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email Agent"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2256,
+        544
+      ],
+      "id": "2a6febc6-4eab-43ec-9d22-c50f8c2a2ad7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WeBZBEVsyXWBXsa1cqB8K",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WeBZBEVsyXWBXsa1cqB8K",
+          "cachedResultName": "Contact Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        176
+      ],
+      "id": "53a48c34-d4a9-4e05-a1b6-daf36ca154ab",
+      "name": "Call 'Contact Agent'",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "L4q3oc5wy8u8EalydWSy8",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/L4q3oc5wy8u8EalydWSy8",
+          "cachedResultName": "Calendar Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1664,
+        560
+      ],
+      "id": "b1dbf2b2-281f-49df-95cb-07e243204c18",
+      "name": "Call 'Calendar Agent'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "AeeLGDO7iaGUfk-uWQKBT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/AeeLGDO7iaGUfk-uWQKBT",
+          "cachedResultName": "Email Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        880
+      ],
+      "id": "9c112061-67fb-40e3-913e-02d5d7d776a4",
+      "name": "Call 'Email Agent'"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.summary }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        560
+      ],
+      "id": "7b02d599-6347-4072-b869-0f04f4401b9f",
+      "name": "Send a text message",
+      "webhookId": "b6190cbe-8950-4242-85b0-3238c12b00ae",
+      "credentials": {
+        "telegramApi": {
+          "id": "xZjV4gPR3127ZD0V",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY_HERE"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"model\": \"llama-3.3-70b-versatile\",\n\"messages\": [\n{\n\"role\": \"system\",\n\"content\": \"Today's date is {{ $now.toISO() }}. The user is in Lagos, Nigeria (WAT, UTC+1). Always interpret times in WAT timezone. Always return dates in ISO 8601 format like 2026-05-22T15:00:00+01:00.\\n\\nYou are a personal assistant that manages calendar, email, and contacts.\\n\\nAnalyze the user's message and respond ONLY with a valid JSON object, no extra text, no markdown, no code blocks.\\n\\nThe JSON must contain:\\n- agent: one of contact, calendar, email\\n- action: the specific action\\n- all other relevant fields\\n\\nCALENDAR actions: get, create, create_with_attendees, reschedule, delete\\nEMAIL actions: get, draft, send, reply, delete\\nCONTACT actions: save, update, retrieve, delete\\n\\nCRITICAL RULES FOR CONTACTS:\\n- Use action 'save' ONLY when creating a brand new contact\\n- Use action 'update' when changing any detail of an existing contact\\n- Use action 'retrieve' when looking up a contact\\n- Use action 'delete' when removing a contact\\n- The 'name' field must always be the full name of the person whose contact is being managed\\n- The 'email' field must always be a valid email address, never a name or business name\\n\\nCRITICAL RULES FOR EMAIL:\\n- If the user mentions a person by name instead of email address, use 'contact_name' field instead of 'to'\\n- If the user provides an email address directly, use 'to' field\\n- Never guess or make up email addresses\\n- For reply and delete actions, always include 'search_term' field with the sender name or subject to search for\\n- For send, draft, and reply actions, always write the 'body' field as a properly structured, professional email. Even if the user gives a casual or short instruction (e.g. 'ask her what's up', 'tell him I'll be late'), expand it into natural, polished email language. Never send the user's words literally — always rewrite them into a complete, professional email body.\\n- Always format the body with a greeting on its own line (e.g. 'Hi Ibiye,'), followed by a blank line, then 'I hope this message finds you well.' followed by the expanded message content, followed by a blank line, then 'Best regards,\\\\nEsther'. Use \\\\n\\\\n between sections.\\n- For get action, always include a 'limit' field with the number of emails the user wants. If the user does not specify a number, default to 5.\\n\\nCRITICAL RULES FOR CALENDAR:\\n- If the user mentions inviting a person by name instead of email, use 'attendee_name' field instead of 'attendees'\\n- If the user provides an email address directly, use 'attendees' field\\n- For reschedule and delete actions, always include 'event_title' field with the name of the event\\n- If the user asks to ALSO email or notify the attendee about the meeting details (e.g. 'and email her the details', 'send him the info too'), add an 'also_email' field set to true. Only add this field when the user explicitly asks for an email to be sent in addition to the calendar invite. Do not add it otherwise.\\n- For get action, ALWAYS use 'startTime' and 'endTime' fields to specify the date range. Never use a 'date' field. For 'today' use start of today to end of today. For 'tomorrow' use start of tomorrow to end of tomorrow. For 'this week' use start of today to 7 days ahead. Always calculate exact ISO 8601 datetimes based on today's date.\\n\\nExamples:\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"get\\\",\\\"startTime\\\":\\\"2026-07-03T00:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-07-03T23:59:59+01:00\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"get\\\",\\\"startTime\\\":\\\"2026-07-02T00:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-07-09T23:59:59+01:00\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"create\\\",\\\"title\\\":\\\"Meeting\\\",\\\"startTime\\\":\\\"2026-05-22T15:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-05-22T16:00:00+01:00\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"delete\\\",\\\"event_title\\\":\\\"Team Sync\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"reschedule\\\",\\\"event_title\\\":\\\"Team Sync\\\",\\\"startTime\\\":\\\"2026-05-22T15:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-05-22T16:00:00+01:00\\\"}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"get\\\",\\\"limit\\\":5}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"get\\\",\\\"limit\\\":10}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"send\\\",\\\"to\\\":\\\"john@gmail.com\\\",\\\"subject\\\":\\\"Report\\\",\\\"body\\\":\\\"Hi John,\\\\n\\\\nI hope this message finds you well. Please find the report attached for your review.\\\\n\\\\nBest regards,\\\\nEsther\\\"}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"send\\\",\\\"contact_name\\\":\\\"Ibiye Bright\\\",\\\"subject\\\":\\\"Checking In\\\",\\\"body\\\":\\\"Hi Ibiye,\\\\n\\\\nI hope this message finds you well. I just wanted to check in and see how things are going on your end.\\\\n\\\\nBest regards,\\\\nEsther\\\"}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"reply\\\",\\\"search_term\\\":\\\"Forbes\\\",\\\"body\\\":\\\"Hi,\\\\n\\\\nI hope this message finds you well. Thank you for the update — I appreciate you keeping me in the loop.\\\\n\\\\nBest regards,\\\\nEsther\\\"}\\n{\\\"agent\\\":\\\"email\\\",\\\"action\\\":\\\"delete\\\",\\\"search_term\\\":\\\"LinkedIn\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"create_with_attendees\\\",\\\"title\\\":\\\"Team Meeting\\\",\\\"startTime\\\":\\\"2026-05-22T15:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-05-22T16:00:00+01:00\\\",\\\"attendee_name\\\":\\\"Ada Okonkwo\\\"}\\n{\\\"agent\\\":\\\"calendar\\\",\\\"action\\\":\\\"create_with_attendees\\\",\\\"title\\\":\\\"Investor Call\\\",\\\"startTime\\\":\\\"2026-05-22T15:00:00+01:00\\\",\\\"endTime\\\":\\\"2026-05-22T16:00:00+01:00\\\",\\\"attendee_name\\\":\\\"Ibiye Bright\\\",\\\"also_email\\\":true}\\n{\\\"agent\\\":\\\"contact\\\",\\\"action\\\":\\\"save\\\",\\\"firstName\\\":\\\"Ada\\\",\\\"lastName\\\":\\\"Okonkwo\\\",\\\"email\\\":\\\"ada@gmail.com\\\",\\\"phone\\\":\\\"08012345678\\\"}\\n{\\\"agent\\\":\\\"contact\\\",\\\"action\\\":\\\"retrieve\\\",\\\"name\\\":\\\"Ada Okonkwo\\\"}\\n{\\\"agent\\\":\\\"contact\\\",\\\"action\\\":\\\"delete\\\",\\\"name\\\":\\\"Ada Okonkwo\\\"}\\n{\\\"agent\\\":\\\"contact\\\",\\\"action\\\":\\\"update\\\",\\\"name\\\":\\\"Ada Okonkwo\\\",\\\"email\\\":\\\"newemail@gmail.com\\\"}\\n{\\\"agent\\\":\\\"contact\\\",\\\"action\\\":\\\"update\\\",\\\"name\\\":\\\"Ibiye Bright\\\",\\\"email\\\":\\\"pristineprintsph@gmail.com\\\"}\"\n},\n{\n\"role\": \"user\",\n\"content\": \"={{ $json.message.text }}\"\n}\n]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -3504,
+        96
+      ],
+      "id": "9c4293a2-95f5-4cc3-92c7-3fc176e8286a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet summary = '';\nconst parsed = [];\n\nfor (const item of items) {\nlet d = item.json;\nif (typeof d.result === 'string') {\ntry { d = JSON.parse(d.result); } catch(e) {}\n}\nparsed.push(d);\n}\n\nconst currentAction = $('Code in JavaScript').first().json.action || '';\nconst alsoEmail = $('Code in JavaScript').first().json.also_email === true;\n\nfunction getOriginalDataField(fieldName) {\ntry {\nconst node2 = $('Code in JavaScript2').first();\nif (node2 && node2.json && node2.json.originalData) {\nconst parsedOriginal = JSON.parse(node2.json.originalData);\nreturn parsedOriginal[fieldName] || '';\n}\nreturn '';\n} catch (e) {\nreturn '';\n}\n}\n\nlet calendarItem = null;\nfor (let i = 0; i < parsed.length; i++) {\nif (parsed[i] && parsed[i].start) {\ncalendarItem = parsed[i];\nbreak;\n}\n}\n\nconst first = calendarItem || parsed[0];\n\nif (first && first.start && currentAction === 'get') {\nsummary = 'Here are your upcoming events:\\n\\n';\nfor (const d of parsed) {\nconst startRaw = (d.start && d.start.dateTime) || (d.start && d.start.date) || '';\nconst endRaw = (d.end && d.end.dateTime) || (d.end && d.end.date) || '';\nconst startDate = new Date(startRaw).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' });\nconst startTime = new Date(startRaw).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Africa/Lagos' });\nconst endTime = new Date(endRaw).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Africa/Lagos' });\nconst title = d.summary || 'Untitled Event';\nconst description = d.description || '';\nconst location = d.location || '';\nconst meetLink = d.hangoutLink || '';\n\nsummary += '*' + title + '*\\n';\nsummary += 'Date: ' + startDate + '\\n';\nsummary += 'Time: ' + startTime + ' - ' + endTime + '\\n';\nif (description) {\nsummary += 'Description: ' + description + '\\n';\n}\nif (location) {\nsummary += 'Location: ' + location + '\\n';\n}\nif (meetLink) {\nsummary += '[Join Meeting](' + meetLink + ')\\n';\n}\nsummary += '\\n';\n}\n} else if (first && first.start && (currentAction === 'create' || currentAction === 'create_with_attendees')) {\nconst title = first.summary || $('Code in JavaScript').first().json.title || 'Meeting';\nconst start = (first.start && first.start.dateTime) || (first.start && first.start.date) || '';\nconst date = new Date(start).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' });\nconst link = first.htmlLink || '';\nconst meetLink = first.hangoutLink || '';\nsummary = title + ' has been scheduled for ' + date + ' successfully!';\nif (meetLink) {\nsummary += '\\n[Join Meeting](' + meetLink + ')';\n}\nif (link) {\nsummary += ' | [View Event](' + link + ')';\n}\nif (alsoEmail) {\nsummary += '\\n\\nThe attendee has also been emailed the meeting details.';\n}\n} else if (first && first.start && currentAction === 'reschedule') {\nconst title = first.summary || $('Code in JavaScript').first().json.title || 'Meeting';\nconst start = (first.start && first.start.dateTime) || (first.start && first.start.date) || '';\nconst date = new Date(start).toLocaleString('en-NG', { timeZone: 'Africa/Lagos' });\nconst link = first.htmlLink || '';\nconst meetLink = first.hangoutLink || '';\nsummary = title + ' has been rescheduled to ' + date + ' successfully!';\nif (meetLink) {\nsummary += '\\n[Join Meeting](' + meetLink + ')';\n}\nif (link) {\nsummary += ' | [View Event](' + link + ')';\n}\n} else if (first && first.start) {\nsummary = 'Calendar action completed successfully!';\n} else if (first && first.resourceName && currentAction === 'save') {\nconst name = $('Code in JavaScript').first().json.name || (($('Code in JavaScript').first().json.firstName || '') + ' ' + ($('Code in JavaScript').first().json.lastName || '')).trim() || 'Contact';\nsummary = name + \"'s contact has been saved successfully!\";\n} else if (first && first.resourceName && currentAction === 'update') {\nconst name = $('Code in JavaScript').first().json.name || 'Contact';\nsummary = name + \"'s contact has been updated successfully!\";\n} else if (first && first.resourceName && currentAction === 'retrieve') {\nconst searchName = ($('Code in JavaScript').first().json.contact_name || $('Code in JavaScript').first().json.name || '').toLowerCase();\nconst filtered = parsed.filter(function(d) {\nconst name = (d.names && d.names.displayName) || '';\nif (!searchName) return true;\nreturn name.toLowerCase().indexOf(searchName) !== -1;\n});\nif (filtered.length === 0) {\nsummary = 'No contact found matching that name.';\n} else {\nfor (const d of filtered) {\nconst name = (d.names && d.names.displayName) || 'Unknown';\nconst email = (d.emailAddresses && d.emailAddresses.work && d.emailAddresses.work[0]) || (d.emailAddresses && d.emailAddresses.home && d.emailAddresses.home[0]) || 'No email';\nconst phone = (d.phoneNumbers && d.phoneNumbers.work && d.phoneNumbers.work[0]) || (d.phoneNumbers && d.phoneNumbers.home && d.phoneNumbers.home[0]) || 'No phone';\nsummary = 'Here is ' + name + \"'s contact details:\\n\";\nsummary += '• Email: ' + email + '\\n';\nsummary += '• Phone: ' + phone + '\\n';\n}\n}\n} else if (first && first.threadId && currentAction === 'get') {\nconst emailLimit = $('Code in JavaScript').first().json.limit || 5;\nconst emailsToShow = parsed.slice(0, emailLimit);\nsummary = 'Here are your ' + emailLimit + ' most recent emails:\\n';\nfor (const d of emailsToShow) {\nconst subject = d.subject || '(no subject)';\nconst from = (d.headers && d.headers.from) || d.from || 'Unknown sender';\nsummary += '• ' + subject + ' - ' + from + '\\n';\n}\n} else if (first && first.threadId && currentAction === 'send') {\nconst to = $('Code in JavaScript').first().json.to || $('Code in JavaScript').first().json.contact_name || 'recipient';\nsummary = 'Email sent to ' + to + ' successfully!';\n} else if ((first && first.threadId && currentAction === 'draft') || (first && first.id && first.message && currentAction === 'draft')) {\nconst to = $('Code in JavaScript').first().json.to || $('Code in JavaScript').first().json.contact_name || 'recipient';\nsummary = 'Email draft to ' + to + ' saved successfully!';\n} else if (first && first.threadId && currentAction === 'reply') {\nsummary = 'Reply sent successfully!';\n} else if (first && first.threadId) {\nsummary = 'Email action completed successfully!';\n} else if (first && first.success === true && currentAction === 'delete') {\nconst searchTerm = getOriginalDataField('search_term');\nconst eventTitle = getOriginalDataField('event_title');\nif (searchTerm) {\nsummary = 'The email from ' + searchTerm + ' has been deleted successfully!';\n} else if (eventTitle) {\nsummary = eventTitle + ' has been deleted successfully!';\n} else {\nconst name = $('Code in JavaScript').first().json.name || $('Code in JavaScript').first().json.contact_name || 'Contact';\nsummary = name + \"'s contact has been deleted successfully!\";\n}\n} else if (first && first.success === true) {\nconst action = $('Code in JavaScript').first().json.action || '';\nconst name = $('Code in JavaScript').first().json.name || $('Code in JavaScript').first().json.contact_name || 'Contact';\nif (action === 'delete') {\nsummary = name + \"'s contact has been deleted successfully!\";\n} else if (action === 'update') {\nsummary = name + \"'s contact has been updated successfully!\";\n} else {\nsummary = 'Action completed successfully!';\n}\n} else {\nsummary = 'Action completed successfully!';\n}\n\nreturn [{ json: { summary } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        560
+      ],
+      "id": "86101089-3afc-4455-b82c-0917b101d655",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "54cf5d47-377c-4712-9c76-809980c56a5d",
+              "leftValue": "={{ $json.contact_name || $json.attendee_name || $json.event_title || $json.search_term }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2752,
+        96
+      ],
+      "id": "7c68b3f8-0fc5-4834-805e-044af34f153d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "WeBZBEVsyXWBXsa1cqB8K",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/WeBZBEVsyXWBXsa1cqB8K",
+          "cachedResultName": "Contact Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -928
+      ],
+      "id": "b6bfd11e-f26a-4679-9e2d-5f27349f4c29",
+      "name": "Call 'Contact Agent'1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\nconst originalData = JSON.parse($('Code in JavaScript2').first().json.originalData || '{}');\n\nconst result = {};\nconst keys = Object.keys(originalData);\nfor (let i = 0; i < keys.length; i++) {\nresult[keys[i]] = originalData[keys[i]];\n}\n\nconst stopWords = ['the', 'a', 'an', 'meeting', 'event', 'call', 'session'];\n\nfunction getSignificantWords(str) {\nreturn str.toLowerCase().split(/\\s+/).filter(function(w) {\nreturn w.length > 0 && stopWords.indexOf(w) === -1;\n});\n}\n\nfunction wordsOverlap(str1, str2) {\nconst words1 = getSignificantWords(str1);\nconst words2 = getSignificantWords(str2);\nif (words1.length === 0 || words2.length === 0) return false;\nfor (let i = 0; i < words1.length; i++) {\nif (words2.indexOf(words1[i]) !== -1) {\nreturn true;\n}\n}\nreturn false;\n}\n\nif (originalData.contact_name || originalData.attendee_name) {\nconst searchName = (originalData.contact_name || originalData.attendee_name || '').toLowerCase();\nlet email = '';\nlet found = false;\nfor (let i = 0; i < inputData.length; i++) {\nif (found) { continue; }\nconst item = inputData[i].json;\nconst name = (item.names && item.names.displayName) || '';\nif (name.toLowerCase().indexOf(searchName) !== -1) {\nemail = (item.emailAddresses && item.emailAddresses.work && item.emailAddresses.work[0]) ||\n(item.emailAddresses && item.emailAddresses.home && item.emailAddresses.home[0]) || '';\nfound = true;\n}\n}\nif (originalData.contact_name) {\nresult.to = email;\ndelete result.contact_name;\n}\nif (originalData.attendee_name) {\nresult.attendees = email;\ndelete result.attendee_name;\n}\n}\n\nif (originalData.event_title) {\nconst eventTitle = originalData.event_title.toLowerCase();\nlet eventId = '';\nlet found = false;\nfor (let i = 0; i < inputData.length; i++) {\nif (found) { continue; }\nconst item = inputData[i].json;\nconst title = (item.summary || '').toLowerCase();\nif (title.indexOf(eventTitle) !== -1 || eventTitle.indexOf(title) !== -1 || wordsOverlap(title, eventTitle)) {\neventId = item.id || '';\nfound = true;\n}\n}\nresult.eventId = eventId;\ndelete result.event_title;\n}\n\nif (originalData.search_term) {\nconst searchTerm = originalData.search_term.toLowerCase();\nlet messageId = '';\nlet threadId = '';\nlet found = false;\nfor (let i = 0; i < inputData.length; i++) {\nif (found) { continue; }\nconst item = inputData[i].json;\nconst subject = (item.subject || '').toLowerCase();\nconst from = ((item.headers && item.headers.from) || '').toLowerCase();\nif (subject.indexOf(searchTerm) !== -1 || from.indexOf(searchTerm) !== -1) {\nmessageId = item.id || '';\nthreadId = item.threadId || '';\nfound = true;\n}\n}\nresult.messageId = messageId;\nresult.threadId = threadId;\ndelete result.search_term;\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -288
+      ],
+      "id": "e60a1d06-33b4-454c-ac12-6ba80ee881f1",
+      "name": "Contact Lookup"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\nconst data = $input.all()[0] ? $input.all()[0].json : {};\n\nconst searchName = data.contact_name || data.attendee_name || '';\nconst eventTitle = data.event_title || '';\nconst searchTerm = data.search_term || '';\n\n// Contact lookup needed\nif (searchName) {\nreturn [{ json: {\nagent: 'contact',\naction: 'retrieve',\nname: searchName,\noriginalData: JSON.stringify(data)\n} }];\n}\n\n// Calendar event lookup needed\nif (eventTitle) {\nreturn [{ json: {\nagent: 'calendar',\naction: 'get',\nstartTime: new Date().toISOString(),\nendTime: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),\noriginalData: JSON.stringify(data)\n} }];\n}\n\n// Email lookup needed\nif (searchTerm) {\nreturn [{ json: {\nagent: 'email',\naction: 'get',\nstartTime: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),\noriginalData: JSON.stringify(data)\n} }];\n}\n\nreturn [{ json: data }];\n} catch(e) {\nreturn [{ json: { error: e.message } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2416,
+        -640
+      ],
+      "id": "5ebf7031-197f-4d10-8c1b-69e3e5f9befb",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "contact",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c478275e-64cc-4287-ab2c-899b2e18f0dc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Contact Lookup"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "99389c7c-0400-4d49-a216-952258ae8c4c",
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "calendar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Calendar Lookup"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c2cf5985-b36f-4c7f-980b-688db5bc5529",
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email Lookup"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2064,
+        -656
+      ],
+      "id": "bd349b6d-1fef-4e1e-a725-ff91e1724497",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "L4q3oc5wy8u8EalydWSy8",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/L4q3oc5wy8u8EalydWSy8",
+          "cachedResultName": "Calendar Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -640
+      ],
+      "id": "9d382ac2-b96f-4cce-8761-28e61be92872",
+      "name": "Call 'Calendar Agent'1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "AeeLGDO7iaGUfk-uWQKBT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/AeeLGDO7iaGUfk-uWQKBT",
+          "cachedResultName": "Email Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -320
+      ],
+      "id": "f4ce1fa5-3fe2-40d1-b256-e17f518456fe",
+      "name": "Call 'Email Agent'1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "91180eba-a829-458c-a885-a4900a607d12",
+              "leftValue": "={{ $('Code in JavaScript').first().json.also_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1424,
+        560
+      ],
+      "id": "6c3aa58f-5ccd-474a-bc0c-518f38c009fc",
+      "name": "Email Attendee"
+    },
+    {
+      "parameters": {
+        "jsCode": "const calendarResult = $input.first().json;\nconst originalData = $('Code in JavaScript').first().json;\n\nconst title = calendarResult.summary || originalData.title || 'Meeting';\nconst start = (calendarResult.start && calendarResult.start.dateTime) || '';\nconst dateObj = new Date(start);\nconst formattedDate = dateObj.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Lagos' });\nconst formattedTime = dateObj.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Africa/Lagos' });\n\nconst meetLink = calendarResult.hangoutLink || '';\nconst eventLink = calendarResult.htmlLink || '';\n\nlet attendeeEmail = '';\nif (calendarResult.attendees && calendarResult.attendees.length > 0) {\nattendeeEmail = calendarResult.attendees[0].email || '';\n}\n\nconst fullName = originalData.attendee_name || 'there';\nconst firstName = fullName.split(' ')[0];\n\nlet body = '<p>Hi ' + firstName + ',</p>';\nbody += '<p>You have been invited to <strong>' + title + '</strong> scheduled for ' + formattedDate + ' at ' + formattedTime + '</p>';\n\nif (meetLink) {\nbody += '<p><a href=\"' + meetLink + '\">Join via Google Meet</a></p>';\n}\nif (eventLink) {\nbody += '<p><a href=\"' + eventLink + '\">View in Calendar</a></p>';\n}\n\nbody += '<p>Looking forward to it!</p>';\nbody += '<p>Best regards,<br>Esther</p>';\n\nreturn [{ json: {\nagent: 'email',\naction: 'send',\nto: attendeeEmail,\nsubject: 'Meeting Invitation: ' + title,\nbody: body\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        544
+      ],
+      "id": "9a1a858c-1345-4b97-8e05-73bcba499481",
+      "name": "Build Email Content"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "AeeLGDO7iaGUfk-uWQKBT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/AeeLGDO7iaGUfk-uWQKBT",
+          "cachedResultName": "Email Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        544
+      ],
+      "id": "7d7f6686-4a5c-4687-9aad-b178c5b26fc0",
+      "name": "Send Meeting Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailResult = $input.first().json;\nconst calendarResult = $('Email Attendee').first().json;\n\nreturn [\n{ json: calendarResult },\n{ json: emailResult }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        544
+      ],
+      "id": "53a6a197-c47e-4e8e-902a-ecbf637d4997",
+      "name": "Combine Calendar & Email Result"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Call 'Contact Agent'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Calendar Agent'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Email Agent'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Contact Agent'": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Calendar Agent'": {
+      "main": [
+        [
+          {
+            "node": "Email Attendee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Email Agent'": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Contact Agent'1": {
+      "main": [
+        [
+          {
+            "node": "Contact Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Lookup": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Contact Agent'1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Calendar Agent'1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Email Agent'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Calendar Agent'1": {
+      "main": [
+        [
+          {
+            "node": "Contact Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Email Agent'1": {
+      "main": [
+        [
+          {
+            "node": "Contact Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Attendee": {
+      "main": [
+        [
+          {
+            "node": "Build Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Content": {
+      "main": [
+        [
+          {
+            "node": "Send Meeting Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Meeting Email": {
+      "main": [
+        [
+          {
+            "node": "Combine Calendar & Email Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Calendar & Email Result": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Lagos",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "e19ef613-aafa-4b4a-b81e-b35412217b76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79ecae331c6df43dbaf93b3ae7b5d063e22770f82f7497bc12ca2bbba9883ec0"
+  },
+  "id": "PmAYwa2pJOiROiiPtWURX",
+  "tags": []
+}

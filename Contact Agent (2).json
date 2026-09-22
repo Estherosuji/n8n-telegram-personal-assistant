@@ -1,0 +1,668 @@
+{
+  "name": "Contact Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        432
+      ],
+      "id": "103c219e-6ff2-4b3c-b854-684767507a31",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "save",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9aeee3b4-75ed-4c11-9cd3-7d123b6862bd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Save Contact"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e4659667-b0d1-4764-b687-300ad96f6f1d",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update Contact"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "839664e0-adf6-418f-8786-47b446b04d48",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "retrieve",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Retrieve Contact"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dd018e06-be32-4b20-aac1-4a38e17ae994",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Delete Contact"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        400
+      ],
+      "id": "adcb6011-1c0f-4ed7-af80-17586a1c8462",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "familyName": "={{ $json.name ? $json.name.split(' ').slice(1).join(' ') : $json.lastName }}",
+        "givenName": "={{ $json.name ? $json.name.split(' ')[0] : $json.firstName }}",
+        "additionalFields": {
+          "emailsUi": {
+            "emailsValues": [
+              {
+                "type": "work",
+                "value": "={{ $json.email }}"
+              }
+            ]
+          },
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "work",
+                "value": "={{ $json.phone }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "88806b27-b70a-4570-94d4-7ff6836e3c9a",
+      "name": "Create a contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.contactId}}",
+        "fields": [
+          "addresses",
+          "biographies",
+          "birthdays",
+          "emailAddresses",
+          "events",
+          "genders",
+          "names",
+          "nicknames",
+          "metadata",
+          "memberships",
+          "locales",
+          "interests",
+          "imClients",
+          "userDefined",
+          "urls",
+          "skills",
+          "sipAddresses",
+          "residences",
+          "relations",
+          "photos",
+          "phoneNumbers",
+          "organizations",
+          "occupations",
+          "coverPhotos"
+        ],
+        "updateFields": {
+          "familyName": "={{ $json.name ? $json.name.split(' ').slice(1).join(' ') : '' }}",
+          "givenName": "={{ $json.name ? $json.name.split(' ')[0] : '' }}",
+          "emailsUi": {
+            "emailsValues": [
+              {
+                "type": "work",
+                "value": "={{ $json.email }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        704,
+        240
+      ],
+      "id": "1223757a-d21b-4bcd-a02c-81f200bedd11",
+      "name": "Update a contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "fields": [
+          "addresses",
+          "*",
+          "biographies",
+          "birthdays",
+          "coverPhotos",
+          "emailAddresses",
+          "events",
+          "genders",
+          "imClients",
+          "interests",
+          "locales",
+          "memberships",
+          "metadata",
+          "names",
+          "nicknames",
+          "occupations",
+          "organizations",
+          "phoneNumbers",
+          "photos",
+          "relations",
+          "residences",
+          "sipAddresses",
+          "skills",
+          "urls",
+          "userDefined"
+        ],
+        "useQuery": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        0,
+        448
+      ],
+      "id": "08d84820-5479-467e-9ce8-cd9dd111df6b",
+      "name": "Get many contacts",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "contactId": "={{ $json.contactId }}"
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        704,
+        784
+      ],
+      "id": "d001cbf3-39f1-4a37-8272-9e45bd677f6e",
+      "name": "Delete a contact",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec5037de-30d4-4e41-9375-35044f8e0e58",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "3f8993ba-bc15-47c4-bcb2-c63429532c4b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec5037de-30d4-4e41-9375-35044f8e0e58",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        240
+      ],
+      "id": "eb8122c9-3a86-4e67-b8c8-0b37ee5a22f7",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec5037de-30d4-4e41-9375-35044f8e0e58",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        448
+      ],
+      "id": "c5042c7b-0e64-46b9-8f0b-327ae6a4017e",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec5037de-30d4-4e41-9375-35044f8e0e58",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        784
+      ],
+      "id": "9700e09b-6bed-435d-9738-123a06d44db5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "fields": [
+          "phoneNumbers",
+          "photos",
+          "relations",
+          "residences",
+          "sipAddresses",
+          "skills",
+          "urls",
+          "userDefined",
+          "organizations",
+          "occupations",
+          "nicknames",
+          "names",
+          "metadata",
+          "memberships",
+          "locales",
+          "interests",
+          "imClients",
+          "genders",
+          "events",
+          "emailAddresses",
+          "coverPhotos",
+          "birthdays",
+          "biographies",
+          "addresses",
+          "*"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        0,
+        784
+      ],
+      "id": "964ea04e-5a02-4139-ae53-d34563c09117",
+      "name": "Get many contacts1",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst searchName = $('When Executed by Another Workflow').first().json.name?.toLowerCase() || '';\n\nconst match = items.find(item => {\nconst name = item.json.names?.displayName || '';\nreturn name.toLowerCase().includes(searchName);\n});\n\nif (!match) {\nreturn [{ json: { error: 'Contact not found', contactId: null } }];\n}\n\nconst resourceName = match.json.resourceName;\nconst contactId = resourceName.replace('people/', '');\n\nreturn [{ json: { contactId, resourceName, name: match.json.names?.displayName } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        784
+      ],
+      "id": "4bd90665-589e-451e-9dbc-94cb43e40d4c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "fields": [
+          "phoneNumbers",
+          "photos",
+          "relations",
+          "residences",
+          "sipAddresses",
+          "skills",
+          "urls",
+          "userDefined",
+          "organizations",
+          "occupations",
+          "nicknames",
+          "names",
+          "metadata",
+          "memberships",
+          "locales",
+          "interests",
+          "imClients",
+          "genders",
+          "events",
+          "emailAddresses",
+          "coverPhotos",
+          "birthdays",
+          "biographies",
+          "addresses",
+          "*"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "e1a0164a-35ab-43e8-a5a3-48334fb7fb18",
+      "name": "Get many contacts2",
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "Idl4uqADaUIiOHOf",
+          "name": "Google Contacts account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst input = $('When Executed by Another Workflow').first().json;\nconst searchName = input.name?.toLowerCase() || '';\n\nconst match = items.find(function(item) {\nconst name = (item.json.names && item.json.names.displayName) || '';\nreturn name.toLowerCase().indexOf(searchName) !== -1;\n});\n\nif (!match) {\nreturn [{ json: { error: 'Contact not found', contactId: null } }];\n}\n\nconst resourceName = match.json.resourceName;\nconst contactId = resourceName.replace('people/', '');\n\nreturn [{ json: {\ncontactId,\nresourceName,\nname: match.json.names.displayName,\nemail: input.email || null,\nphone: input.phone || null,\nfirstName: input.firstName || null,\nlastName: input.lastName || null\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        240
+      ],
+      "id": "c57b26bd-c7eb-4aaa-b6c0-5c71ca18515c",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many contacts2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many contacts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a contact": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a contact": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Delete a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Lagos",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "924d38c5-2250-4606-a60c-7e64bf1bcef3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79ecae331c6df43dbaf93b3ae7b5d063e22770f82f7497bc12ca2bbba9883ec0"
+  },
+  "id": "WeBZBEVsyXWBXsa1cqB8K",
+  "tags": []
+}

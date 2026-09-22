@@ -1,0 +1,600 @@
+{
+  "name": "Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1840,
+        400
+      ],
+      "id": "58de1f4b-184f-4acc-a35a-ecc4ef3ce4c8",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "29e3f5e4-4aa2-49be-9942-8771984c8d34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Get Email Summaries"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ca99ca77-3ffe-4c35-8634-6ea8bf28e158",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "draft",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Draft New Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "23d706e5-56f4-49bc-9b51-a7a1254eff70",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "send",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send New Email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0e5950b7-86cd-40b6-b6ab-afd7602b0a7b",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Reply to Email (in thread)"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7b1fb477-98ff-468f-b5fb-8188de82dd4d",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Delete Email"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1440,
+        352
+      ],
+      "id": "6944c3df-53b9-4f83-b9a8-15f9eb5e6120",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "simple": false,
+        "filters": {
+          "readStatus": "both",
+          "receivedAfter": "={{ $json.startTime ?? $now.minus({ days: 7 }) }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "30af4b88-4e26-4e9c-b809-152915cd980e",
+      "name": "Get many messages",
+      "webhookId": "d59ef2a0-b36f-4465-ae55-2af149a7da9d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7HF1p8MLrhLhyL8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.body }}",
+        "options": {
+          "sendTo": "={{ $json.to }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        336
+      ],
+      "id": "b22d7f4d-8b93-4274-bae0-addbdd70e3ba",
+      "name": "Create a draft",
+      "webhookId": "0c303e50-df3a-4c21-bbad-b1ce3dbe431b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7HF1p8MLrhLhyL8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        560
+      ],
+      "id": "c7f29247-e227-43dd-a3f8-4f0840e97e31",
+      "name": "Send a message",
+      "webhookId": "1e76ae77-96e8-45f6-bdbd-73ec9a60f6c4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7HF1p8MLrhLhyL8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $json.threadId }}",
+        "messageId": "={{ $json.messageId }}",
+        "emailType": "html",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        784
+      ],
+      "id": "8846630e-2153-48c8-a228-29eb50df443e",
+      "name": "Reply to a message",
+      "webhookId": "5db4e1a2-35f6-4752-a5da-7000f28373ea",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7HF1p8MLrhLhyL8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "messageId": "={{ $json.messageId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        1056
+      ],
+      "id": "59e19a74-202c-4a2e-a4c6-d9712d321b6b",
+      "name": "Delete a message",
+      "webhookId": "b075da0c-200e-4cd7-955a-e61f64d1f94e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V7HF1p8MLrhLhyL8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c07fa9c2-8d38-4b8d-81bf-068c89834331",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        0
+      ],
+      "id": "77c0ed0c-0d01-4b80-bcb7-e9d0540912ff",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c07fa9c2-8d38-4b8d-81bf-068c89834331",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        336
+      ],
+      "id": "3bcda24f-dcd7-4f25-b899-179196a8865e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c07fa9c2-8d38-4b8d-81bf-068c89834331",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        560
+      ],
+      "id": "20d83bfb-546c-4228-91a0-afff2de94853",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c07fa9c2-8d38-4b8d-81bf-068c89834331",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        784
+      ],
+      "id": "13da6600-a9cb-4755-8ae6-6eeb9aebc22c",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c07fa9c2-8d38-4b8d-81bf-068c89834331",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        1056
+      ],
+      "id": "b1febd54-bbb8-4f63-9630-7b4fb7684f31",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst result = Object.assign({}, data);\n\nif (result.body) {\n  result.body = result.body.replace(/\\n/g, '<br>');\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        544
+      ],
+      "id": "d2fc1a2a-12e0-44d6-b497-5745ec13852d",
+      "name": "Format Email Body"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst result = Object.assign({}, data);\n\nif (result.body) {\n  result.body = result.body.replace(/\\n/g, '<br>');\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        336
+      ],
+      "id": "a4bb9288-c8e3-43eb-8400-c858c0736e34",
+      "name": "Format Draft Body"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst result = Object.assign({}, data);\n\nif (result.body) {\n  result.body = result.body.replace(/\\n/g, '<br>');\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        784
+      ],
+      "id": "cdd9b9aa-ae52-4508-b245-dc7e3bffb2c1",
+      "name": "Format Reply Body"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Draft Body",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Email Body",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Reply Body",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email Body": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Draft Body": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Reply Body": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Lagos",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "30d0ab85-92fb-4dcf-80c2-45e3294fa787",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79ecae331c6df43dbaf93b3ae7b5d063e22770f82f7497bc12ca2bbba9883ec0"
+  },
+  "id": "AeeLGDO7iaGUfk-uWQKBT",
+  "tags": []
+}
